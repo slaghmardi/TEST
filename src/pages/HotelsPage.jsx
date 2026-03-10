@@ -1,5 +1,7 @@
 import { useState } from 'react'
 
+const API = 'http://localhost:5000/api'
+
 function HotelsPage({ hotels, setHotels }) {
   const [name, setName] = useState('')
   const [city, setCity] = useState('')
@@ -9,13 +11,22 @@ function HotelsPage({ hotels, setHotels }) {
   const [preference, setPreference] = useState('')
   const [selectedCity, setSelectedCity] = useState('')
 
-  const addHotel = () => {
+  const addHotel = async () => {
     if (!name || !city || !stars || !price) return alert('Please fill all fields')
-    setHotels([...hotels, { id: Date.now(), name, city, stars: Number(stars), pricePerNight: Number(price) }])
+    const res = await fetch(`${API}/hotels`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, city, stars: Number(stars), pricePerNight: Number(price) })
+    })
+    const newHotel = await res.json()
+    setHotels([...hotels, newHotel])
     setName(''); setCity(''); setStars(''); setPrice('')
   }
 
-  const removeHotel = (id) => setHotels(hotels.filter(h => h.id !== id))
+  const removeHotel = async (id) => {
+    await fetch(`${API}/hotels/${id}`, { method: 'DELETE' })
+    setHotels(hotels.filter(h => h.id !== id))
+  }
 
   let filtered = hotels.filter(h => {
     if (search.toLowerCase() === 'cheap') return true

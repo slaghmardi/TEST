@@ -1,17 +1,28 @@
 import { useState } from 'react'
 
+const API = 'http://localhost:5000/api'
+
 function UsersPage({ users, setUsers }) {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [country, setCountry] = useState('')
 
-  const addUser = () => {
+  const addUser = async () => {
     if (!name || !email || !country) return alert('Please fill all fields')
-    setUsers([...users, { id: Date.now(), name, email, country }])
+    const res = await fetch(`${API}/users`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, country })
+    })
+    const newUser = await res.json()
+    setUsers([...users, newUser])
     setName(''); setEmail(''); setCountry('')
   }
 
-  const removeUser = (id) => setUsers(users.filter(u => u.id !== id))
+  const removeUser = async (id) => {
+    await fetch(`${API}/users/${id}`, { method: 'DELETE' })
+    setUsers(users.filter(u => u.id !== id))
+  }
 
   return (
     <div>

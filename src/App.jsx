@@ -1,15 +1,22 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
-import { initialUsers, initialHotels, initialReservations } from './data/seedData'
 import UsersPage from './pages/UsersPage'
 import HotelsPage from './pages/HotelsPage'
 import ReservationsPage from './pages/ReservationsPage'
 import Dashboard from './pages/Dashboard'
 
+const API = 'http://localhost:5000/api'
+
 function App() {
-  const [users, setUsers] = useState(initialUsers)
-  const [hotels, setHotels] = useState(initialHotels)
-  const [reservations, setReservations] = useState(initialReservations)
+  const [users, setUsers] = useState([])
+  const [hotels, setHotels] = useState([])
+  const [reservations, setReservations] = useState([])
+
+  useEffect(() => {
+    fetch(`${API}/users`).then(r => r.json()).then(setUsers)
+    fetch(`${API}/hotels`).then(r => r.json()).then(setHotels)
+    fetch(`${API}/reservations`).then(r => r.json()).then(setReservations)
+  }, [])
 
   return (
     <BrowserRouter>

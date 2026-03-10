@@ -1,5 +1,7 @@
 import { useState } from 'react'
 
+const API = 'http://localhost:5000/api'
+
 function ReservationsPage({ users, hotels, reservations, setReservations }) {
   const [userId, setUserId] = useState('')
   const [hotelId, setHotelId] = useState('')
@@ -12,10 +14,16 @@ function ReservationsPage({ users, hotels, reservations, setReservations }) {
     : 0
   const predictedPrice = selectedHotel ? nights * selectedHotel.pricePerNight : 0
 
-  const addReservation = () => {
+  const addReservation = async () => {
     if (!userId || !hotelId || !checkIn || !checkOut) return alert('Please fill all fields')
     if (nights <= 0) return alert('Check-out must be after check-in')
-    setReservations([...reservations, { id: Date.now(), userId: Number(userId), hotelId: Number(hotelId), checkIn, checkOut, totalPrice: predictedPrice }])
+    const res = await fetch(`${API}/reservations`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: Number(userId), hotelId: Number(hotelId), checkIn, checkOut, totalPrice: predictedPrice })
+    })
+    const newReservation = await res.json()
+    setReservations([...reservations, newReservation])
     setUserId(''); setHotelId(''); setCheckIn(''); setCheckOut('')
   }
 
